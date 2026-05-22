@@ -43,5 +43,6 @@ Sprite sprnew(Palette* palette,unsigned char w,unsigned char h,char* data);
 void sprdel(Sprite* s);
 //se libera espacio del sprite
 
-void sprdrw(Sprite s,unsigned short r,unsigned short c) {
+void sprdrw(Sprite s,unsigned short r,unsigned short c);
+//imprime un sprite y lo coloca en una determinada posicion
     

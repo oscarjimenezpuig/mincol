@@ -157,8 +157,8 @@ static void datapos(unsigned short* r,unsigned short* c,unsigned char w,char* d,
     //Da la fila y la columna de un puntero a los datos
     *r=(pd-d)/w;
     *c=(pd-d)%w;
-    *r+=PIXDIM;
-    *C+=PIXDIM;
+    *r*=PIXDIM;
+    *c*=PIXDIM;
 }
 
 static char poralloc(Sprite* s,unsigned short x,unsigned short y,unsigned long c) {
@@ -179,9 +179,9 @@ Sprite sprnew(Palette* p,unsigned char w,unsigned char h,char* d) {
     char* pd=d;
     Sprite s={p,w,h,0,NULL};
     while(*pd!='\0') {
-        char cc=*pd-'0';
+        short cc=*pd-'0';
         if(cc>0 && cc<=9) {
-            unsigned long col=p->col[cc];
+            long unsigned int col=p->col[cc].cc;
             unsigned short x0,y0;
             datapos(&y0,&x0,w,d,pd);
             for(int k=0;k<4;k++) {
@@ -206,7 +206,12 @@ void sprdel(Sprite* s) {
 void sprdrw(Sprite s,unsigned short r,unsigned short c) {
     Point* ppo=s.po;
     while(ppo!=s.po+s.pos) {
-        x_pixel(c+ppo->x,r+ppo->y,ppo->col,
+        x_pixel(c+ppo->x,r+ppo->y,ppo->col);
+        ppo++;
+    }
+}
+
+
 
 
 
