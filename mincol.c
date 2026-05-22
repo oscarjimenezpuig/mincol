@@ -6,6 +6,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include "mincol.h"
+
 //XVIDEO
 
 typedef XPoint X_Point;
@@ -130,23 +132,93 @@ Color colnew(double r,double g,double b) {
 
 //PALETTE
 
-#define PALETTES 8 //numero maximo de paletas 
-
-static Palette palettes[PALETTES];
-
-signed char palnew(unsigned char cs,...) {
-    static unsigned char ID=1;
-    if(ID<PALETTES) {
-        Palette* p=palettes+ID;
-        va_list list;
-        va_start(list,cs);
-        for(int k=0;k<cs;k++) {
-            p->col[k]=va_arg(list,Color);
-        }
-        va_end(list);
-        return ID++;
+Palette palnew(unsigned char cs,...) {
+    Palette p;
+    va_list list;
+    va_start(list,cs);
+    for(int k=0;k<cs;k++) {
+        p.col[k]=va_arg(list,Color);
     }
-    return NULPAL;
+    va_end(list);
+    for(int c=cs;c<PALDIM;c++) p.col[c]=(Color){0,0,0,X_BLACK};
+    return p;
 }
+
+//SPRITE
+
+#define PIXDIM 6 //tamaño de un pixel
+
+static char dataget(unsigned char r,unsigned char c,unsigned char w,char* d) {
+    //Da el dato que se encuentra en la fila r columna c
+    return d[c+r*w]-'0';
+}
+
+static void datapos(unsigned short* r,unsigned short* c,unsigned char w,char* d,char* pd) {
+    //Da la fila y la columna de un puntero a los datos
+    *r=(pd-d)/w;
+    *c=(pd-d)%w;
+    *r+=PIXDIM;
+    *C+=PIXDIM;
+}
+
+static char poralloc(Sprite* s,unsigned short x,unsigned short y,unsigned long c) {
+    //realoca los puntos del sprite para dar cabida a los siguientes
+    Point* ptr=realloc(s->po,sizeof(Point)+(s->pos+1));
+    if(ptr) {
+        s->po=ptr;
+        s->po[s->pos++]=(Point){x,y,c};
+        return 1;
+    }
+    return 0;
+}
+
+Sprite sprnew(Palette* p,unsigned char w,unsigned char h,char* d) {
+    const int DXV[]={0,PIXDIM/2,(PIXDIM/2)+1,PIXDIM-1};
+    const int DYUV[]={0,PIXDIM/2,(PIXDIM/2),0};
+    const int DYDV[]={PIXDIM-1,(PIXDIM/2)+1,(PIXDIM/2)+1,PIXDIM-1};
+    char* pd=d;
+    Sprite s={p,w,h,0,NULL};
+    while(*pd!='\0') {
+        char cc=*pd-'0';
+        if(cc>0 && cc<=9) {
+            unsigned long col=p->col[cc];
+            unsigned short x0,y0;
+            datapos(&y0,&x0,w,d,pd);
+            for(int k=0;k<4;k++) {
+                poralloc(&s,x0+DXV[k],y0+DYUV[k],col);
+                poralloc(&s,x0+DXV[k],y0+DYDV[k],col);
+            }
+        }
+    }
+    return s;
+}
+
+void sprdel(Sprite* s) {
+    if(s) {
+        free(s->po);
+        s->po=NULL;
+        s->pos=0;
+        s->w=s->h=0;
+        s->pal=NULL;
+    }
+}
+
+void sprdrw(Sprite s,unsigned short r,unsigned short c) {
+    Point* ppo=s.po;
+    while(ppo!=s.po+s.pos) {
+        x_pixel(c+ppo->x,r+ppo->y,ppo->col,
+
+
+
+
+
+
+
+            
+
+
+    
+
+
 
 

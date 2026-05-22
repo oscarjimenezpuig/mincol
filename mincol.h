@@ -17,23 +17,31 @@ typedef struct {
 //Paleta: guarda los colores (de 1 a 9) que se usaran en un sprite
 
 typedef struct {
-    unsigned char r,c;
+    unsigned short x,y;
     long unsigned int col;
-} Pixel;
+} Point;
 //Pixel: Componente de un sprite que contiene la posicion y el numero de color
 
 typedef struct {
-    unsigned char pal;
+    Palette* pal;
     unsigned char w,h;
-    unsigned short pixs;
-    Pixel* pix;
+    unsigned short pos;
+    Point* po;
 } Sprite;
 //Sprite: dibujo compuesto por una cantidad de pixeles concreta
 
 Color colnew(double r,double g,double b);
 //colnew: definicion de un nuevo color
 
-signed char palnew(unsigned char cols,...);
+Palette palnew(unsigned char cols,...);
 //definicion de una nueva paleta (devuelve el indice de referencia) se entra el numero de colores de la paleta hasta 9 maximo
 
+Sprite sprnew(Palette* palette,unsigned char w,unsigned char h,char* data);
+//definicion de un sprite, data han de ser numero de 0 a 9, donde 0 representa
+//el pixel vacio
 
+void sprdel(Sprite* s);
+//se libera espacio del sprite
+
+void sprdrw(Sprite s,unsigned short r,unsigned short c) {
+    
