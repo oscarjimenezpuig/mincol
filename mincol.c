@@ -121,3 +121,32 @@ int x_inkey(KeySym* keysym) {
 	}
 	return return_type;
 }
+
+//COLOR
+
+Color colnew(double r,double g,double b) {
+    return (Color){r,g,b,x_color(r,g,b)};
+}
+
+//PALETTE
+
+#define PALETTES 8 //numero maximo de paletas 
+
+static Palette palettes[PALETTES];
+
+signed char palnew(unsigned char cs,...) {
+    static unsigned char ID=1;
+    if(ID<PALETTES) {
+        Palette* p=palettes+ID;
+        va_list list;
+        va_start(list,cs);
+        for(int k=0;k<cs;k++) {
+            p->col[k]=va_arg(list,Color);
+        }
+        va_end(list);
+        return ID++;
+    }
+    return NULPAL;
+}
+
+
