@@ -1,48 +1,54 @@
 /* MINCOL 225-26 */
 
-#include <stdarg.h>
+#include <stdint.h>
 
-#define PALDIM 9 // dimension de la paleta
-#define NULPAL -1 //valor que indica que el identificador de la paleta es nulo
+//CONSTANTES
 
-typedef struct {
-    double r,g,b;
-    long unsigned int cc;
-} Color;
+//constantes de pantalla
+#define CARW 32 //numero de columnas de caracter
+#define CARH 23 //numero de filas de caracter
+#define CARD 8 //dimension de un caracter
+
+//constantes de paleta
+#define PALDIM 4 //dimension de la paleta
+
+//constantes de entrada teclado
+#define KEYDIM 4 //numero de teclas que pueden ser almacenadas a la vez
+
+//TIPOS
+
+typedef long unsigned int Color;
 //Color: guarda la combinacion de colores asi como el codigo del color
 
-typedef struct {
-    Color col[PALDIM];
-} Palette;
-//Paleta: guarda los colores (de 1 a 9) que se usaran en un sprite
+typedef Color Palette[PALDIM];
+//Palette: Coleccion de colores de un sprite
 
 typedef struct {
-    unsigned short x,y;
-    long unsigned int col;
-} Point;
-//Pixel: Componente de un sprite que contiene la posicion y el numero de color
+    uint8_t x,y;
+    uint8_t cc;
+} Pixel;
+//Pixel: x,y posicion del pixel, cc el codigo de color segun la paleta
 
 typedef struct {
-    Palette* pal;
-    unsigned char w,h;
-    unsigned short pos;
-    Point* po;
+    Color* pal;
+    uint8_t w,h;
+    uint16_t pixs;
+    Pixel* pix;
 } Sprite;
 //Sprite: dibujo compuesto por una cantidad de pixeles concreta
+
+//FUNCIONES
 
 Color colnew(double r,double g,double b);
 //colnew: definicion de un nuevo color
 
-Palette palnew(unsigned char cols,...);
-//definicion de una nueva paleta (devuelve el indice de referencia) se entra el numero de colores de la paleta hasta 9 maximo
-
-Sprite sprnew(Palette* palette,unsigned char w,unsigned char h,char* data);
+Sprite sprnew(Palette palette,uint8_t w,uint8_t h,char* data);
 //definicion de un sprite, data han de ser numero de 0 a 9, donde 0 representa
 //el pixel vacio
 
 void sprdel(Sprite* s);
 //se libera espacio del sprite
 
-void sprdrw(Sprite s,unsigned short r,unsigned short c);
+void sprdrw(Sprite s, int16_t x,int16_t y);
 //imprime un sprite y lo coloca en una determinada posicion
     

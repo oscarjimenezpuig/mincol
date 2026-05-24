@@ -10,14 +10,16 @@
 
 //XVIDEO
 
+#define PIXDIM 4 //dimension del pixel
+
 typedef XPoint X_Point;
 typedef long unsigned int X_Color;
 
 X_Color X_BLACK=0;
 X_Color X_WHITE=0;
 
-unsigned int X_WINW=0;
-unsigned int X_WINH=0;
+uint16_t X_WINW=CARW*CARD*PIXDIM;
+uint16_t X_WINH=CARH*CARD*PIXDIM;
 static Display* display=NULL;
 static Colormap colormap;
 static Window window;
@@ -31,9 +33,7 @@ X_Color x_color(double red,double green,double blue);
 
 void x_flush();
 
-int x_init(unsigned int w,unsigned int h) {
-	X_WINW=w;
-	X_WINH=h;
+int x_init() {
 	int screenum=0;
 	display=XOpenDisplay(0);
 	if(display) {
@@ -91,9 +91,16 @@ X_Color x_color(double r,double g,double b) {
 	return xc.pixel;
 }
 
-void x_pixel(short x,short y,X_Color c) {
-    XSetForeground(display,graphic,c);
-    XDrawPoint(display,virtual,graphic,x,y);
+#define inxwin(X,Y) ((X)>=0 && (X)<X_WINW && (Y)>=0 && (Y)<X_WINH)
+
+void x_foreground(X_Color c) {
+     XSetForeground(display,graphic,c);
+}
+
+void x_pixel(short x,short y) {
+    if(inxwin(x,y)) {
+           XDrawPoint(display,virtual,graphic,x,y);
+    }
 }
 
 void x_flush() {
@@ -127,67 +134,46 @@ int x_inkey(KeySym* keysym) {
 //COLOR
 
 Color colnew(double r,double g,double b) {
-    return (Color){r,g,b,x_color(r,g,b)};
-}
-
-//PALETTE
-
-Palette palnew(unsigned char cs,...) {
-    Palette p;
-    va_list list;
-    va_start(list,cs);
-    for(int k=0;k<cs;k++) {
-        p.col[k]=va_arg(list,Color);
-    }
-    va_end(list);
-    for(int c=cs;c<PALDIM;c++) p.col[c]=(Color){0,0,0,X_BLACK};
-    return p;
+    return x_color(r,g,b);
 }
 
 //SPRITE
 
-#define PIXDIM 6 //tamaño de un pixel
-
-static char dataget(unsigned char r,unsigned char c,unsigned char w,char* d) {
-    //Da el dato que se encuentra en la fila r columna c
-    return d[c+r*w]-'0';
-}
-
-static void datapos(unsigned short* r,unsigned short* c,unsigned char w,char* d,char* pd) {
-    //Da la fila y la columna de un puntero a los datos
-    *r=(pd-d)/w;
-    *c=(pd-d)%w;
-    *r*=PIXDIM;
-    *c*=PIXDIM;
-}
-
-static char poralloc(Sprite* s,unsigned short x,unsigned short y,unsigned long c) {
-    //realoca los puntos del sprite para dar cabida a los siguientes
-    Point* ptr=realloc(s->po,sizeof(Point)+(s->pos+1));
-    if(ptr) {
-        s->po=ptr;
-        s->po[s->pos++]=(Point){x,y,c};
-        return 1;
-    }
-    return 0;
-}
-
-Sprite sprnew(Palette* p,unsigned char w,unsigned char h,char* d) {
-    const int DXV[]={0,PIXDIM/2,(PIXDIM/2)+1,PIXDIM-1};
-    const int DYUV[]={0,PIXDIM/2,(PIXDIM/2),0};
-    const int DYDV[]={PIXDIM-1,(PIXDIM/2)+1,(PIXDIM/2)+1,PIXDIM-1};
+static uint16_t datalen(char* d) {
+    // cuenta la longitud de datos validos  
+    uint16_t counter=0;
     char* pd=d;
-    Sprite s={p,w,h,0,NULL};
     while(*pd!='\0') {
-        short cc=*pd-'0';
-        if(cc>0 && cc<=9) {
-            long unsigned int col=p->col[cc].cc;
-            unsigned short x0,y0;
-            datapos(&y0,&x0,w,d,pd);
-            for(int k=0;k<4;k++) {
-                poralloc(&s,x0+DXV[k],y0+DYUV[k],col);
-                poralloc(&s,x0+DXV[k],y0+DYDV[k],col);
+        uint8_t val=*pd++-'0';
+        if(val>0 && val<=PALDIM) counter++;
+    }
+    return counter;
+}       
+
+Sprite sprnew(Palette p,uint8_t w,uint8_t h,char* d) {
+    uint16_t dl=datalen(d);
+    Sprite s={p,w,h,dl,NULL};
+    if(dl) {
+        if((s.pix=malloc(sizeof(Pixel)*dl))) {
+            char* pd=d;
+            uint16_t count=0;
+            Pixel* ppix=s.pix;
+            while(*pd!='\0') {
+                uint8_t c=(*pd)-'0';
+                if(c>=0 && c<=PALDIM) {
+                    if(c>0) {
+                        uint8_t x=count%w;
+                        uint8_t y=count/w;
+                        Pixel p={x,y,c-1};
+                        *ppix++=p;
+                    }
+                    count++;
+                }
+                pd++;
             }
+        } else {
+            s.w=s.h=0;
+            s.pixs=0;
         }
     }
     return s;
@@ -195,20 +181,46 @@ Sprite sprnew(Palette* p,unsigned char w,unsigned char h,char* d) {
 
 void sprdel(Sprite* s) {
     if(s) {
-        free(s->po);
-        s->po=NULL;
-        s->pos=0;
+        free(s->pix);
+        s->pix=NULL;
+        s->pixs=0;
         s->w=s->h=0;
         s->pal=NULL;
     }
 }
 
-void sprdrw(Sprite s,unsigned short r,unsigned short c) {
-    Point* ppo=s.po;
-    while(ppo!=s.po+s.pos) {
-        x_pixel(c+ppo->x,r+ppo->y,ppo->col);
-        ppo++;
+void sprdrw(Sprite s,int16_t x,int16_t y) {
+    Pixel* pp=s.pix;
+    if(inxwin((x*PIXDIM),(y*PIXDIM))) {
+        while(pp!=s.pix+s.pixs) {
+            int32_t px=(x+pp->x)*PIXDIM;
+            int32_t py=(y+pp->y)*PIXDIM;
+            if(inxwin(px,py)) {
+                x_foreground(s.pal[pp->cc]);
+                for(int32_t ay=0;ay<PIXDIM;ay++) {
+                    for(int32_t ax=0;ax<=PIXDIM/2;ax++) {
+                        int32_t fx=(ay%2);
+                        x_pixel(px+ax*2+fx,py+ay);
+                    }
+                }
+            }
+            pp++;
+        }
     }
+}
+
+//PRUEBA
+
+int main() {
+    x_init();
+    Palette p={colnew(1,0,0),colnew(0.5,0,0)};
+    char* data="00111100 01111110 11111111 22222222 21111222 21122222 02222220 00222200";
+    Sprite s=sprnew(p,8,8,data);
+    sprdrw(s,10,10);
+    x_flush();
+    getchar();
+    sprdel(&s);
+    x_end();
 }
 
 
