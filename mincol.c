@@ -31,6 +31,8 @@ static int max_key_code=0;
 
 X_Color x_color(double red,double green,double blue);
 
+void x_cls();
+
 void x_flush();
 
 int x_init() {
@@ -59,9 +61,8 @@ int x_init() {
 			mapped=(!mapped)?(event.type==MapNotify):1;
 		}
 		XDisplayKeycodes(display,&min_key_code,&max_key_code);
-		XSetForeground(display,graphic,gv.background);
-		XFillRectangle(display,virtual,graphic,0,0,X_WINW,X_WINH);
-		x_flush();
+		x_cls();
+        x_flush();
 		return 1;
 	}
 	return 0;
@@ -103,6 +104,11 @@ void x_pixel(short x,short y) {
     }
 }
 
+void x_cls() {
+    XSetForeground(display,graphic,background);
+	XFillRectangle(display,virtual,graphic,0,0,X_WINW,X_WINH);
+}
+
 void x_flush() {
 	XCopyArea(display,virtual,window,graphic,0,0,X_WINW,X_WINH,0,0);
 	while(XPending(display)==0);
@@ -135,6 +141,19 @@ int x_inkey(KeySym* keysym) {
 
 Color colnew(double r,double g,double b) {
     return x_color(r,g,b);
+}
+
+//VENTANA
+
+void winbkg(Color c) {
+    if(background!=c) {
+        background=c;
+        x_cls();
+    }
+}
+
+void wincls() {
+    x_cls();
 }
 
 //SPRITE
@@ -198,8 +217,8 @@ void sprdrw(Sprite s,int16_t x,int16_t y) {
             if(inxwin(px,py)) {
                 x_foreground(s.pal[pp->cc]);
                 for(int32_t ay=0;ay<PIXDIM;ay++) {
+                    int32_t fx=(ay%2);
                     for(int32_t ax=0;ax<=PIXDIM/2;ax++) {
-                        int32_t fx=(ay%2);
                         x_pixel(px+ax*2+fx,py+ay);
                     }
                 }
@@ -209,6 +228,71 @@ void sprdrw(Sprite s,int16_t x,int16_t y) {
     }
 }
 
+void sprcls(Sprite s,int16_t x,int16_t y) {
+    int32_t px=x*PIXDIM;
+    int32_t py=y*PIXDIM;
+    if(inxwin(px,py)) {
+        x_foreground(background);
+        for(int32_t ay=0;ay<s.h*PIXDIM;ay++) {
+            int32_t fx=ay%2;
+            for(int32_t ax=0;ax<=(s.w*PIXDIM/2);ax++) {
+                x_pixel(px+ax*2+fx,py+ay);
+            }
+        }
+    }
+}               
+       
+
+//INKEY
+
+static char keyp[KEYDIM];
+
+uint8_t keylst() {
+    static uint8_t init=0;
+    if(!init) {
+        char* p=keyp;
+        while(p!=keyp+KEYDIM) *p++=0;
+        init=1;
+    }
+    KeySym ks;
+    int8_t p;
+    if((p=x_inkey(&ks))) {
+        char c=(char)ks;
+        if((c>='0' && c<='9') || (c>='a' && c<='z')) {
+            char* pp=keyp;
+            if(p==1) {
+                while(pp!=keyp+KEYDIM) {
+                    if(*pp==0) {
+                        *pp=c;
+                        return 1;
+                    }
+                    pp++;
+                }
+            } else if(p==-1) {
+                while(pp!=keyp+KEYDIM) {
+                    if(*pp==c) {
+                        *pp=0;
+                        return 1;
+                    }
+                    pp++;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+uint8_t keyink(char c) {
+    char* pp=keyp;
+    while(pp!=keyp+KEYDIM) {
+        if(*pp++==c) return 1;
+    }
+    return 0;
+}
+
+
+
+
 //PRUEBA
 
 int main() {
@@ -216,9 +300,19 @@ int main() {
     Palette p={colnew(1,0,0),colnew(0.5,0,0)};
     char* data="00111100 01111110 11111111 22222222 21111222 21122222 02222220 00222200";
     Sprite s=sprnew(p,8,8,data);
+    winbkg(colnew(50,50,125));
     sprdrw(s,10,10);
     x_flush();
-    getchar();
+    uint8_t end=0;
+    while(!end) {
+        if(keylst()) {
+            if(keyink('f')) end=1;
+            if(keyink('s')) {
+                sprcls(s,10,10);
+                x_flush();
+            }
+        }
+    }
     sprdel(&s);
     x_end();
 }

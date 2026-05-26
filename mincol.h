@@ -42,6 +42,12 @@ typedef struct {
 Color colnew(double r,double g,double b);
 //colnew: definicion de un nuevo color
 
+void winbkg(Color color);
+//establecemos el color del background
+
+void wincls();
+//borramos toda la ventana y establecemos el color del background
+
 Sprite sprnew(Palette palette,uint8_t w,uint8_t h,char* data);
 //definicion de un sprite, data han de ser numero de 0 a 9, donde 0 representa
 //el pixel vacio
@@ -51,4 +57,13 @@ void sprdel(Sprite* s);
 
 void sprdrw(Sprite s, int16_t x,int16_t y);
 //imprime un sprite y lo coloca en una determinada posicion
+
+void sprcls(Sprite s,int16_t x,int16_t y);
+//borrado de un sprite que ocupa la posicion dicha
+
+uint8_t keylst();
+//se escucha a ver si hay alguna tecla que es pulsada o despulsada
+
+uint8_t keyink(char a);
+//mira si la tecla es pulsada o no 
     
