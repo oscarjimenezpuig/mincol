@@ -290,8 +290,26 @@ uint8_t keyink(char c) {
     return 0;
 }
 
+//RECTANGLE
 
-
+Rectangle recint(Rectangle a,Rectangle b) {
+    Rectangle r;
+    if(a.x<b.x) {
+        r.x=a.x;
+        r.w=(a.w>b.x)?a.w-b.x:0;
+    } else {
+        r.x=b.x;
+        r.w=(b.w>a.x)?b.w-a.x:0;
+    }
+    if(a.y<b.y) {
+        r.y=a.y;
+        r.h=(a.h>b.y)?a.h-b.y:0;
+    } else {
+        r.y=b.y;
+        r.h=(b.h>a.y)?b.h-a.y:0;
+    }
+    return r;
+}
 
 //PRUEBA
 
