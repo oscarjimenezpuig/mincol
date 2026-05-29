@@ -64,6 +64,9 @@ Sprite sprnew(Palette palette,uint8_t w,uint8_t h,char* data);
 //definicion de un sprite, data han de ser numero de 0 a 9, donde 0 representa
 //el pixel vacio
 
+Sprite sprcpy(Sprite s);
+//copia un sprite
+
 void sprdel(Sprite* s);
 //se libera espacio del sprite
 
@@ -72,6 +75,9 @@ void sprdrw(Sprite s, int16_t x,int16_t y);
 
 void sprcls(Sprite s,int16_t x,int16_t y);
 //borrado de un sprite que ocupa la posicion dicha
+
+void sprpal(Sprite* s,Palette palette);
+// cambia la paleta de un sprite
 
 uint8_t keylst();
 //se escucha a ver si hay alguna tecla que es pulsada o despulsada

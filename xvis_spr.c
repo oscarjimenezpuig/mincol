@@ -40,6 +40,30 @@ Sprite sprref(Sprite s,Reflection r) {
     return rs;
 }
 
+static Pixel onerot(Pixel p,uint8_t h) {
+    //rota el pixel una vez
+    return (Pixel){h-p.y,p.x,p.cc};
+}
+
+Sprite sprrot(Sprite s,uint8_t rots) {
+    Sprite rs={s.pal,0,0,0,NULL};
+    uint8_t rsw=(rots%2)?s.h:s.w;
+    uint8_t rsh=(rots%2)?s.w:s.h;
+    if(spralloc(&rs,rsw,rsh,s.pixs)) {
+        Pixel* ps=s.pix;
+        Pixel* pr=rs.pix;
+        while(ps!=s.pix+s.pixs) {
+            *pr=*ps;
+            for(int k=0;k<rots;k++) {
+                *pr=onerot(*ps,s.h);
+            }
+            pr++;
+            ps++;
+        }
+    }
+    return rs;
+}
+
 //PRUEBA
 
 int main() {
@@ -49,7 +73,7 @@ int main() {
    Palette p={red,white};
    char* data="11111000 11122000 11111000 11000000 11000000 11111200 10000000 11200000";
    Sprite s=sprnew(p,8,8,data);
-   Sprite r=sprref(s,REFY|REFX);
+   Sprite r=sprrot(s,1);
    sprdrw(s,10,10);
    sprdrw(r,40,10);
    winfls();

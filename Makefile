@@ -82,6 +82,6 @@ check:
 #MAKEFILE VARIABLE
 
 NAME =  mincol
-SCRS = mincol.c
+SCRS = xvis.c xvis_util.c xvis_spr.c
 INCLUDES = -lX11
 

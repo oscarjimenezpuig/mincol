@@ -7,6 +7,9 @@
 typedef enum {NONE=0,REFX=1,REFY=2} Reflection;
 
 Sprite sprref(Sprite s,Reflection r);
-//Se crea un sprite simetrico con reflexiones respecto a X o Y o a las dos */
+//Se crea un sprite simetrico con reflexiones respecto a X o Y o a las dos
+
+Sprite sprrot(Sprite s,uint8_t rots);
+//Rota 90 grados en la direccion de las agujas del reloj el sprite. rots indica el numero de rotaciones
 
 

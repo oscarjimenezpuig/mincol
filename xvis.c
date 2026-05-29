@@ -182,7 +182,7 @@ static uint16_t datalen(char* d) {
 Sprite sprnew(Palette p,uint8_t w,uint8_t h,char* d) {
     uint16_t dl=datalen(d);
     Sprite s={p,w,h,dl,NULL};
-    if(dl) {
+    if(p && dl) {
         if((s.pix=malloc(sizeof(Pixel)*dl))) {
             char* pd=d;
             uint16_t count=0;
@@ -206,6 +206,21 @@ Sprite sprnew(Palette p,uint8_t w,uint8_t h,char* d) {
         }
     }
     return s;
+}
+
+Sprite sprcpy(Sprite s) {
+    Sprite cs={s.pal,0,0,0,NULL};
+    if((cs.pix=malloc(sizeof(Pixel)*s.pixs))) {
+        cs.w=s.w;
+        cs.h=s.h;
+        cs.pixs=s.pixs;
+        Pixel* po=s.pix;
+        Pixel* pd=cs.pix;
+        while(po!=s.pix+s.pixs) {
+            *pd++=*po++;
+        }
+    }
+    return cs;
 }
 
 void sprdel(Sprite* s) {
@@ -250,8 +265,13 @@ void sprcls(Sprite s,int16_t x,int16_t y) {
             }
         }
     }
-}               
-       
+}
+
+void sprpal(Sprite* s,Palette p) {
+    if(s && p) {
+        s->pal=p;
+    }
+}      
 
 //INKEY
 
