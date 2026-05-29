@@ -12,4 +12,5 @@ Sprite sprref(Sprite s,Reflection r);
 Sprite sprrot(Sprite s,uint8_t rots);
 //Rota 90 grados en la direccion de las agujas del reloj el sprite. rots indica el numero de rotaciones
 
-
+Sprite spramp(Sprite s,uint8_t fact);
+//Amplia un sprite de manera que por cada sprite se generan fact*fact nuevos sprites

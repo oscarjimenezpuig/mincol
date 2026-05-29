@@ -64,16 +64,42 @@ Sprite sprrot(Sprite s,uint8_t rots) {
     return rs;
 }
 
+static Pixel* pixamp(Pixel* r,Pixel p,uint8_t fact) {
+    // se amplia un pixel y se devuelve el numero de pixels ampliados
+    uint8_t pxi=p.x*fact;
+    uint8_t pyi=p.y*fact;
+    Pixel* pr=r;
+    for(uint8_t px=pxi;px<pxi+fact;px++) {
+        for(uint8_t py=pyi;py<pyi+fact;py++) {
+            *pr++=(Pixel){px,py,p.cc};
+        }
+    }
+    return pr;
+}
+
+Sprite spramp(Sprite s,uint8_t fact) {
+    Sprite rs={s.pal,0,0,0,NULL};
+    if(spralloc(&rs,s.w*fact,s.h*fact,s*pics*fact*fact)) {
+        Pixel* ps=s.pix;
+        Pixel* pr=rs.pix;
+
+
+}
+
 //PRUEBA
 
 int main() {
    winini();
    Color red=colnew(125,0,0);
    Color white=colnew(125,125,125);
+   Color green=colnew(0,125,0);
+   Color mix=colnew(50,100,0);
    Palette p={red,white};
+   Palette q={green,mix};
    char* data="11111000 11122000 11111000 11000000 11000000 11111200 10000000 11200000";
    Sprite s=sprnew(p,8,8,data);
-   Sprite r=sprrot(s,1);
+   Sprite r=sprcpy(s);
+   sprpal(&r,q);
    sprdrw(s,10,10);
    sprdrw(r,40,10);
    winfls();
