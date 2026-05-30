@@ -2,6 +2,9 @@
 
 //Libreria encargada de la generacion de ventanas, sprites y deteccion de teclas
 
+#ifndef XVIS
+#define XVIS
+
 #include <stdint.h>
 
 //CONSTANTES
@@ -38,6 +41,12 @@ typedef struct {
     Pixel* pix;
 } Sprite;
 //Sprite: dibujo compuesto por una cantidad de pixeles concreta
+
+typedef struct {
+    int16_t x,y;
+    uint16_t w,h;
+} Rectangle;
+//Rectangle: Definicion de un rectangulo
 
 
 //FUNCIONES
@@ -79,8 +88,16 @@ void sprcls(Sprite s,int16_t x,int16_t y);
 void sprpal(Sprite* s,Palette palette);
 // cambia la paleta de un sprite
 
+Rectangle recint(Rectangle a,Rectangle b);
+//operacion que da el rectangulo interseccion de dos rectangulos
+
+void recdrw(Rectangle r,Color c);
+// dibuja el rectangulo relleno de color c
+
 uint8_t keylst();
 //se escucha a ver si hay alguna tecla que es pulsada o despulsada
 
 uint8_t keyink(char a);
 //mira si la tecla es pulsada o no
+
+#endif //XVIS

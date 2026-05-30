@@ -2,6 +2,9 @@
 
 //Libreria que sirve para hacer diversas operaciones con los sprites
 
+#ifndef XVIS_SPR
+#define XVIS_SPR
+
 #include "xvis.h"
 
 typedef enum {NONE=0,REFX=1,REFY=2} Reflection;
@@ -14,3 +17,6 @@ Sprite sprrot(Sprite s,uint8_t rots);
 
 Sprite spramp(Sprite s,uint8_t fact);
 //Amplia un sprite de manera que por cada sprite se generan fact*fact nuevos sprites
+
+#endif //XVIS_SPR
+

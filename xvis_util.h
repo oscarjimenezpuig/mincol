@@ -2,16 +2,10 @@
 
 //Utilidades minimas para cualquier programa
 
+#ifndef XVIS_UTIL
+#define XVIS_UTIL
+
 #include <stdint.h>
-
-typedef struct {
-    int16_t x,y;
-    uint16_t w,h;
-} Rectangle;
-//Rectangle: Definicion de un rectangulo
-
-Rectangle recint(Rectangle a,Rectangle b);
-//operacion que da el rectangulo interseccion de dos rectangulos
 
 int16_t nummax(int16_t a,int16_t b);
 // determina el maximo entre dos numeros
@@ -27,3 +21,7 @@ int16_t rndval(int16_t a,int16_t b);
 
 void timpau(double time);
 // se hace una pausa de un tiempo concreto
+
+#endif //XVIS_UTIL
+
+

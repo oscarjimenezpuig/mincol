@@ -102,9 +102,13 @@ void x_pixel(short x,short y) {
     }
 }
 
+void  x_rectangle(int x,int y,unsigned int w,unsigned int h,X_Color c) {
+    XSetForeground(display,graphic,c);
+	XFillRectangle(display,virtual,graphic,x,y,w,h);
+}
+
 void x_cls() {
-    XSetForeground(display,graphic,background);
-	XFillRectangle(display,virtual,graphic,0,0,X_WINW,X_WINH);
+    x_rectangle(0,0,X_WINH,X_WINW,background);
 }
 
 void x_flush() {
@@ -271,7 +275,32 @@ void sprpal(Sprite* s,Palette p) {
     if(s && p) {
         s->pal=p;
     }
-}      
+}
+
+//RECTANGLE
+
+Rectangle recint(Rectangle a,Rectangle b) {
+    Rectangle r;
+    if(a.x<b.x) {
+        r.x=a.x;
+        r.w=(a.w>b.x)?a.w-b.x:0;
+    } else {
+        r.x=b.x;
+        r.w=(b.w>a.x)?b.w-a.x:0;
+    }
+    if(a.y<b.y) {
+        r.y=a.y;
+        r.h=(a.h>b.y)?a.h-b.y:0;
+    } else {
+        r.y=b.y;
+        r.h=(b.h>a.y)?b.h-a.y:0;
+    }
+    return r;
+}
+
+void recdrw(Rectangle r,Color c) {
+    x_rectangle(r.x,r.y,r.w,r.h,c);
+}
 
 //INKEY
 

@@ -79,11 +79,12 @@ static Pixel* pixamp(Pixel* r,Pixel p,uint8_t fact) {
 
 Sprite spramp(Sprite s,uint8_t fact) {
     Sprite rs={s.pal,0,0,0,NULL};
-    if(spralloc(&rs,s.w*fact,s.h*fact,s*pics*fact*fact)) {
+    if(spralloc(&rs,s.w*fact,s.h*fact,s.pixs*fact*fact)) {
         Pixel* ps=s.pix;
         Pixel* pr=rs.pix;
-
-
+        while(ps!=s.pix+s.pixs) pr=pixamp(pr,*ps++,fact);
+    }
+    return rs;
 }
 
 //PRUEBA
@@ -94,15 +95,18 @@ int main() {
    Color white=colnew(125,125,125);
    Color green=colnew(0,125,0);
    Color mix=colnew(50,100,0);
+   Color cyan=colnew(0,125,125);
    Palette p={red,white};
    Palette q={green,mix};
    char* data="11111000 11122000 11111000 11000000 11000000 11111200 10000000 11200000";
    Sprite s=sprnew(p,8,8,data);
-   Sprite r=sprcpy(s);
+   Sprite r=spramp(s,10);
    sprpal(&r,q);
+   Rectangle rec={10,10,100,100};
+   recdrw(rec,cyan);
    sprdrw(s,10,10);
    sprdrw(r,40,10);
-   winfls();
+      winfls();
    while(1) {
        keylst();
        if(keyink('f')) break;
