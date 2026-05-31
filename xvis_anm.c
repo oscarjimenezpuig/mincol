@@ -55,9 +55,16 @@ uint8_t anmact(Animation* a,Sprite** s) {
     return 0;
 }
 
+Sprite* anmget(Animation a) {
+    if(a.spr) return a.spr[a.ptr];
+    else return NULL;
+}
+
 uint8_t anmend(Animation a) {
     return (a.clc==0 && a.spr[a.ptr]==NULL);
 }
-            
 
+
+
+    
     

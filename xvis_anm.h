@@ -38,6 +38,9 @@ uint8_t anmact(Animation* a,Sprite** s);
 //se hace actuacion de animacion, si hay transicion el resultado es 1 y se pasa el sprite que toca
 //si ha llegado al final o no hay transicion devuelve 0
 
+Sprite* anmget(Animation a);
+//da el sprite al que se apunta actualmente
+
 uint8_t anmend(Animation a);
 //dice si la animacion ha llegado al final
 

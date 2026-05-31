@@ -298,8 +298,12 @@ Rectangle recint(Rectangle a,Rectangle b) {
     return r;
 }
 
+uint8_t recexs(Rectangle r) {
+    return (r.w*r.h!=0);
+}
+
 void recdrw(Rectangle r,Color c) {
-    x_rectangle(r.x,r.y,r.w,r.h,c);
+    if (r.w*r.h!=0) x_rectangle(r.x,r.y,r.w,r.h,c);
 }
 
 //INKEY

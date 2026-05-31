@@ -91,6 +91,9 @@ void sprpal(Sprite* s,Palette palette);
 Rectangle recint(Rectangle a,Rectangle b);
 //operacion que da el rectangulo interseccion de dos rectangulos
 
+uint8_t recexs(Rectangle r);
+//funcion que dice si el rectangulo tiene o no sentido (dimensiones estrictamente mayores que 0)
+
 void recdrw(Rectangle r,Color c);
 // dibuja el rectangulo relleno de color c
 
